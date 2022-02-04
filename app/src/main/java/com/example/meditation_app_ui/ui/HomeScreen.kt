@@ -28,6 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.meditation_app_ui.BottomMenuItems
 import com.example.meditation_app_ui.Feature
 import com.example.meditation_app_ui.R
 import com.example.meditation_app_ui.standardQuadFromTo
@@ -78,6 +79,14 @@ fun HomeScreen() {
                 )
             )
         }
+        BottomNavBar(items = listOf(
+            BottomMenuItems("Home", R.drawable.ic_home),
+            BottomMenuItems("Meditate", R.drawable.ic_bubble),
+            BottomMenuItems("Sleep", R.drawable.ic_moon),
+            BottomMenuItems("Music", R.drawable.ic_music),
+            BottomMenuItems("Profile", R.drawable.ic_profile),
+
+        ), modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 
@@ -173,6 +182,7 @@ fun CurrentMeditation(
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
+                .clickable {  }
                 .background(ButtonBlue)
                 .padding(10.dp)
         ){
@@ -294,14 +304,84 @@ fun FeatureItem(
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .clickable {
-
-                    }
                     .align(Alignment.BottomEnd)
                     .clip(RoundedCornerShape(10.dp))
                     .background(ButtonBlue)
+                    .clickable {  }
                     .padding(vertical = 6.dp, horizontal = 15.dp)
             )
         }
     }
+}
+
+@Composable
+fun BottomNavBar(
+    items: List<BottomMenuItems>,
+    modifier: Modifier = Modifier,
+    activeHighlightColor : Color = ButtonBlue,
+    activeTextColor : Color = Color.White,
+    inactiveTextColor : Color = AquaBlue,
+    initialSelectedItemIndex : Int = 0
+) {
+    var selectedItemIndex by remember{
+        mutableStateOf(initialSelectedItemIndex)
+    }
+    Row(
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .background(DeepBlue)
+            .padding(15.dp)
+    ) {
+        items.forEachIndexed { index, item ->
+            NavBarItem(
+                item = item,
+                isSelected = index == selectedItemIndex,
+                activeHighlightColor = activeHighlightColor,
+                activeTextColor = activeTextColor,
+                inactiveTextColor = inactiveTextColor
+            ) {
+                selectedItemIndex = index
+            }
+        }
+    }
+}
+
+@Composable
+fun NavBarItem(
+    item : BottomMenuItems,
+    isSelected : Boolean = false,
+    activeHighlightColor : Color = ButtonBlue,
+    activeTextColor : Color = Color.White,
+    inactiveTextColor : Color = AquaBlue,
+    onItemClick: () -> Unit
+) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .clickable {
+                    onItemClick()
+                }
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(if (isSelected) activeHighlightColor else Color.Transparent)
+                    .padding(10.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = item.iconId),
+                    contentDescription = item.title,
+                    tint = if (isSelected) activeTextColor else inactiveTextColor,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+            Text(
+                text = item.title,
+                color = if (isSelected) activeTextColor else inactiveTextColor
+            )
+        }
 }
